@@ -555,11 +555,9 @@ Nossa equipe de terapeutas especialistas combina conhecimento anatômico rigoros
 <div>
 <input 
   class="w-full bg-surface-container-low border-b-2 border-outline-variant/30 focus:border-primary px-4 py-3 rounded-t-md outline-none transition-colors text-body-md text-on-surface-variant" 
-  id="data-agenda" 
-  type="datetime-local" 
-  required 
-  placeholder="Selecione a data e horário"
-/>
+  id="data-agenda"type="text"placeholder="Selecione a data e horário"onfocus="(this.type='datetime-local')"onblur="if(!this.value)this.type='text'"
+  required/>
+
  
 </div>
 

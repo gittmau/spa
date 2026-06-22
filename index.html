@@ -550,14 +550,19 @@ Nossa equipe de terapeutas especialistas combina conhecimento anatômico rigoros
       <option value="Drenagem Linfática">Drenagem Linfática</option>
     </select>
   </div>
+<!-- ➕ COLE ESTE BLOCO DA DATA EXATAMENTE AQUI: -->
+  <div>
+    <label class="block font-label-md text-label-md text-on-surface mb-2" for="data-agenda">Data Desejada</label>
+    <input class="w-full bg-surface-container-low border-b-2 border-outline-variant/30 focus:border-primary px-4 py-3 rounded-t-md outline-none transition-colors text-body-md text-on-surface-variant" id="data-agenda" type="date" required />
+  </div>
 
-<!-- Novo campo para o cliente escolher o dia e hora da massagem -->
-<div>
-<label for="data-agenda" class="block font-label-md text-label-md text-on-surface mb-2">Selecione a data e horário</label>
-<input 
-  class="w-full bg-surface-container-low border-b-2 border-outline-variant/30 focus:border-primary px-4 py-3 rounded-t-md outline-none transition-colors text-body-md text-on-surface-variant"
- id="data-agenda" type="datetime-local" placeholder="Selecione a data e horário" required/>
-</div>
+  <!-- 2. Campo que será preenchido dinamicamente com os horários livres -->
+  <div>
+    <label class="block font-label-md text-label-md text-on-surface mb-2" for="hora-agenda">Horários Disponíveis para este dia</label>
+    <select class="w-full bg-surface-container-low border-b-2 border-outline-variant/30 focus:border-primary px-4 py-3 rounded-t-md outline-none transition-colors text-body-md text-on-surface-variant appearance-none" id="hora-agenda" disabled required>
+      <option value="">Selecione a data primeiro...</option>
+    </select>
+  </div>
 
 
   <!-- ATENÇÃO AQUI: Mudado para type="button". Isso IMPEDE qualquer recarregamento da página -->
@@ -628,7 +633,7 @@ Aceitam convênios médicos?
 </div>
 
 <!-- Procure a chamada do seu script no final do body e mude para isto: -->
-<script src="script.js?v=versao_nova" defer></script>
+<script src="script.js?v=anti_conflito_rodando" defer></script>
 
 
 

@@ -94,75 +94,116 @@ updateCarousel();
 
 
 //Formulario
+
 document.addEventListener("DOMContentLoaded", function() {
-const btn = document.getElementById('btn-enviar');
+    const btn = document.getElementById('btn-enviar');
+    const campoData = document.getElementById('data-agenda');
+    const campoHora = document.getElementById('hora-agenda');
+    
+    // O seu link oficial do Google Apps Script
+    const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbxcICCK9h7lUWLUe-rL67PkrXe4icEgDVm0jzyiJDUxmfLcS81hBf3n8qkB3utJgaCVjQ/exec";
 
-if (btn) {
-btn.addEventListener('click', function(e) {
-e.preventDefault(); 
+    // 🔍 FUNÇÃO ISOLADA QUE BUSCA OS HORÁRIOS NO GOOGLE
+    function buscarHorariosLivres() {
+        const dataSelecionada = campoData.value; // Formato AAAA-MM-DD
+        if (!dataSelecionada) return;
 
-// Captura os elementos da tela
-const campoNome = document.getElementById('nome');
-const campoWhats = document.getElementById('whats');
-const campoServico = document.getElementById('servico');
-const campoDataAgenda = document.getElementById('data-agenda'); // Novo campo
+        campoHora.innerHTML = '<option value="">Buscando horários livres...</option>';
+        campoHora.disabled = true;
 
-const nome = campoNome.value.trim();
-const whats = campoWhats.value.trim();
-const dataAgendaRaw = campoDataAgenda.value; // Pega o valor cru (AAAA-MM-DDTHH:MM)
+        // Faz a consulta de leitura com a rota de redirecionamento autorizada
+        fetch(urlGoogleSheets + "?data=" + dataSelecionada, {
+            method: "GET",
+            redirect: "follow"
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Erro na rede do servidor");
+            return response.json();
+        })
+        .then(data => {
+            campoHora.innerHTML = '<option value="">Selecione um horário</option>';
+            
+            if (data.horariosLivres && data.horariosLivres.length > 0) {
+                data.horariosLivres.forEach(hora => {
+                    campoHora.innerHTML += `<option value="${hora}">${hora}</option>`;
+                });
+                campoHora.disabled = false; // 🔓 DESTRAVA O CAMPO E DEIXA CLICÁVEL!
+            } else {
+                campoHora.innerHTML = '<option value="">Nenhum horário disponível para este dia</option>';
+            }
+        })
+        .catch(err => {
+            console.error("Erro na conexão:", err);
+            campoHora.innerHTML = '<option value="">Erro ao conectar com o servidor</option>';
+        });
+    }
 
-if (!campoServico || campoServico.selectedIndex === -1) {
-alert("Por favor, selecione um serviço!");
-return;
-}
-const servicoTexto = campoServico.options[campoServico.selectedIndex].text;
+    // 🕵️ MONITORAMENTO EM TEMPO REAL: Acorda com cliques, digitação ou preenchimento automático
+    if (campoData) {
+        campoData.addEventListener('input', buscarHorariosLivres);
+        campoData.addEventListener('change', buscarHorariosLivres);
 
-// Validação: Garante que todos os campos foram preenchidos
-if (!nome || !whats || campoServico.value === "" || !dataAgendaRaw) {
-alert("Por favor, preencha todos os campos e selecione a data do agendamento!");
-return;
-}
+        // 🚀 VERIFICAÇÃO INICIAL: Se o campo já abrir preenchido sozinho, ele já roda a busca na hora!
+        if (campoData.value) {
+            buscarHorariosLivres();
+        }
+    }
 
-// Formata a data escolhida pelo cliente para o padrão brasileiro (Ex: 20/06/2026 às 14:30)
-const dataObjeto = new Date(dataAgendaRaw);
-const dataFormatada = dataObjeto.toLocaleDateString('pt-BR') + ' às ' + dataObjeto.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+    // 📥 PROCESSAMENTO DO ENVIO FINAL DO FORMULÁRIO
+    if (btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault(); 
 
-// Trava o botão visualmente
-btn.innerText = "Enviando dados...";
-btn.disabled = true;
+            const campoNome = document.getElementById('nome');
+            const campoWhats = document.getElementById('whats');
+            const campoServico = document.getElementById('servico');
 
-const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbxcICCK9h7lUWLUe-rL67PkrXe4icEgDVm0jzyiJDUxmfLcS81hBf3n8qkB3utJgaCVjQ/exec";
+            if (!campoNome || !campoWhats || !campoServico || !campoData || !campoHora) {
+                alert("Erro interno: Verifique os IDs no HTML.");
+                return;
+            }
 
-// Inclui a nova informação 'dataEscolha' no pacote que vai para o Google
-const dadosParaPlanilha = {
-nome: nome,
-whatsapp: whats,
-servico: servicoTexto,
-dataEscolha: dataFormatada 
-};
+            const nome = campoNome.value.trim();
+            const whats = campoWhats.value.trim();
+            const dataTexto = campoData.value;
+            const horaTexto = campoHora.value;
+            const servicoTexto = campoServico.options[campoServico.selectedIndex] ? campoServico.options[campoServico.selectedIndex].text : '';
 
-// Envia para o Google Sheets em segundo plano
-fetch(urlGoogleSheets, {
-method: 'POST',
-mode: 'no-cors', 
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify(dadosParaPlanilha)
-});
+            if (!nome || !whats || campoServico.value === "" || !dataTexto || !horaTexto) {
+                alert("Por favor, preencha todos os campos e escolha um horário disponível!");
+                return;
+            }
 
-// Exibe a mensagem de sucesso e limpa a tela
-setTimeout(function() {
-alert("Obrigado! Seus dados e a preferência de horário foram enviados. Nossa equipe entrará em contato em breve via WhatsApp para confirmar a sua sessão!");
+            btn.innerText = "Enviando dados...";
+            btn.disabled = true;
 
-campoNome.value = "";
-campoWhats.value = "";
-campoServico.selectedIndex = 0;
-campoDataAgenda.value = "";
+            const dadosParaPlanilha = {
+                nome: nome,
+                whatsapp: whats,
+                servico: servicoTexto,
+                dataEscolha: dataTexto,
+                horaEscolha: horaTexto
+            };
 
-btn.innerText = "Solicitar Agendamento";
-btn.disabled = false;
-}, 300);
-});
-}
+            fetch(urlGoogleSheets, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosParaPlanilha)
+            });
+
+            setTimeout(function() {
+                alert("Agendamento solicitado com sucesso! Verifique a planilha para confirmar.");
+                campoNome.value = "";
+                campoWhats.value = "";
+                campoServico.selectedIndex = 0;
+                campoData.value = "";
+                campoHora.innerHTML = '<option value="">Selecione a data primeiro...</option>';
+                campoHora.disabled = true;
+
+                btn.innerText = "Solicitar Agendamento";
+                btn.disabled = false;
+            }, 300);
+        });
+    }
 });

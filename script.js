@@ -28,8 +28,6 @@ mudarTexto.classList.remove('highlight');
 
 
 
-
-
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
 const nav = document.getElementById('navbar');
@@ -84,7 +82,7 @@ updateCarousel();
 });
 });
 
-// Optional: Auto-play functionality
+//  Auto-play functionality
 setInterval(() => {
 currentSlide = (currentSlide + 1) % totalSlides;
 updateCarousel();
@@ -103,7 +101,7 @@ const campoHora = document.getElementById('hora-agenda');
 // O seu link oficial do Google Apps Script
 const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbxcICCK9h7lUWLUe-rL67PkrXe4icEgDVm0jzyiJDUxmfLcS81hBf3n8qkB3utJgaCVjQ/exec";
 
-// 🔍 FUNÇÃO ISOLADA QUE BUSCA OS HORÁRIOS NO GOOGLE
+//  FUNÇÃO ISOLADA QUE BUSCA OS HORÁRIOS NO GOOGLE
 function buscarHorariosLivres() {
 const dataSelecionada = campoData.value; // Formato AAAA-MM-DD
 if (!dataSelecionada) return;
@@ -127,7 +125,7 @@ if (data.horariosLivres && data.horariosLivres.length > 0) {
 data.horariosLivres.forEach(hora => {
 campoHora.innerHTML += `<option value="${hora}">${hora}</option>`;
 });
-campoHora.disabled = false; // 🔓 DESTRAVA O CAMPO E DEIXA CLICÁVEL!
+campoHora.disabled = false; // DESTRAVA O CAMPO E DEIXA CLICÁVEL!
 } else {
 campoHora.innerHTML = '<option value="">Nenhum horário disponível para este dia</option>';
 }
@@ -138,7 +136,7 @@ campoHora.innerHTML = '<option value="">Erro ao conectar com o servidor</option>
 });
 }
 
-// 🕵️ MONITORAMENTO EM TEMPO REAL: Acorda com cliques, digitação ou preenchimento automático
+//  MONITORAMENTO EM TEMPO REAL: Acorda com cliques, digitação ou preenchimento automático
 if (campoData) {
 campoData.addEventListener('input', buscarHorariosLivres);
 campoData.addEventListener('change', buscarHorariosLivres);
@@ -149,7 +147,7 @@ buscarHorariosLivres();
 }
 }
 
-// 📥 PROCESSAMENTO DO ENVIO FINAL DO FORMULÁRIO
+//  PROCESSAMENTO DO ENVIO FINAL DO FORMULÁRIO
 if (btn) {
 btn.addEventListener('click', function(e) {
 e.preventDefault(); 
